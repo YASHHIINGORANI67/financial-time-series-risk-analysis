@@ -1,0 +1,15 @@
+smpl 2022-01-03 2025-11-20
+
+set echo off
+
+
+loop p=0..4
+    loop q=0..4
+        arima p q ; LogReturn --quiet --conditional
+        printf "AR=%d MA=%d BIC=%.8g\n", p, q, $bic
+    endloop
+endloop
+
+
+
+

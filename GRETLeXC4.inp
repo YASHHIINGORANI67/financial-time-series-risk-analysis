@@ -1,0 +1,16 @@
+# Comienza el historial 2026-01-21 10:57
+# Registro de las instrucciones de la sesión.  Por favor, tenga en
+# cuenta que probablemente necesitará editar este guion antes
+# de ejecutarlo.
+open \
+  "C:\Users\leavi\OneDrive\Escritorio\POOLIMI\Quant Met and fin\trabajo\logreturnsexcel.xlsx"
+setobs 5 2022-01-03 --time-series
+square Excessreturn
+corrgm sq_Excessreturn 20
+corrgm sq_Excessreturn 30
+# modelo 1
+garch 1 1 ; LogReturn
+# modelo 2
+garch 1 1 ; LogReturn
+# modelo 3
+garch 2 1 ; LogReturn
