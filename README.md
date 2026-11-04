@@ -135,3 +135,13 @@ python Exc1y2.py
 The script requires internet access to download MELI data from Yahoo Finance through `yfinance` and a graphical session to display Matplotlib charts. Its price request starts on **2021-12-31** and ends at **2026-01-16 (exclusive)**. The script uses adjusted closing prices and logarithmic returns. The dependency versions are bounded ranges, **not a tested lockfile**; the exact results depend on data-provider revisions and the installed package versions.
 
 **Verification status:** The script and its imports were inspected to prepare these instructions. A clean-environment end-to-end execution, numerical output comparison, automated test suite and rolling risk backtests have **not** been completed as part of this documentation update.
+
+### Synthetic risk-measure unit tests (new)
+
+The [tail-risk tests](tests/test_tail_risk.py) check historical quantile/ES conventions, the expected ordering of ES and VaR, Student-t location shifts and invalid-input handling using **synthetic return arrays**. Run them with:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+A [GitHub Actions workflow](.github/workflows/tail-risk-tests.yml) is configured to run these tests on relevant pushes, pull requests and manual dispatch. **These are formula-level checks, not MELI historical data validation, rolling VaR backtests or evidence of investment performance.** CI success has not yet been observed during this update.
