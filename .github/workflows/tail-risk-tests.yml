@@ -6,6 +6,7 @@ on:
       - 'tests/**'
       - 'requirements.txt'
       - 'rolling_var_backtest.py'
+      - 'christoffersen_var.py'
       - '.github/workflows/tail-risk-tests.yml'
   pull_request:
   workflow_dispatch:
