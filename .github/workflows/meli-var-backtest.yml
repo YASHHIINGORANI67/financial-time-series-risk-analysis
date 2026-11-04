@@ -1,0 +1,25 @@
+name: MELI historical VaR backtest
+
+on:
+  workflow_dispatch:
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install backtest dependencies
+        run: python -m pip install numpy pandas scipy yfinance
+      - name: Run historical MELI VaR backtest
+        run: python rolling_var_backtest.py --ticker MELI --start 2021-12-31 --end 2026-01-16 --window 250 --alpha 0.01 --output backtest_results.csv
+      - name: Upload forecast and breach observations
+        uses: actions/upload-artifact@v4
+        with:
+          name: meli-var-backtest-results
+          path: backtest_results.csv
+          if-no-files-found: error
