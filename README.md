@@ -205,3 +205,17 @@ python compare_var_models.py --ticker MELI --start 2021-12-31 --end 2026-01-16 -
 ```
 
 For reproducible offline input, use `--csv path/to/returns.csv` with a `log_return` or `Close` column. The command writes `model_comparison_results/forecasts.csv`, `summary.csv` and `configuration.json`. The GitHub Actions workflow uploads the same outputs as downloadable artifacts. **Do not treat the workflow as a validated empirical result until its actual run and metrics have been reviewed.** Live Yahoo Finance data can be revised; a fixed versioned input dataset would improve reproducibility. Low breach counts limit the accuracy of asymptotic chi-square tests, and comparisons should not be selected solely on p-values.
+
+### Observed three-model MELI comparison (completed GitHub Actions run, 2026-11-04)
+
+The project owner's completed [MELI model-comparison workflow](https://github.com/YASHHIINGORANI67/financial-time-series-risk-analysis/actions/runs/41751360867) reported the following results on **763 aligned daily forecasts**, with 250 initial training observations, 1% VaR tail probability and **7.63 expected breaches** per model:
+
+| Model | Breaches | Observed rate | Kupiec p | Independence p | Conditional coverage p |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Historical rolling VaR | 14 | 1.8349% | 0.037911 | 0.25192 | 0.060155 |
+| EWMA-normal VaR | 12 | 1.5727% | 0.14229 | 0.17670 | 0.13682 |
+| Fixed-parameter Gaussian GARCH(1,1) VaR | 3 | 0.39318% | 0.054823 | 0.87761 | 0.15636 |
+
+Kupiec unconditional coverage rejects **historical VaR** at the 5% level. The independence and conditional coverage tests do **not** reject any model at 5%. GARCH produces the fewest exceptions but appears conservative relative to the nominal 1% breach frequency; its Kupiec p-value is only marginally above 0.05. EWMA is a promising candidate for further assessment, **not a proven winner**. The apparent discrepancy between historical VaR's Kupiec rejection and its conditional-coverage non-rejection reflects distinct chi-square reference distributions (1 versus 2 degrees of freedom), not a contradiction.
+
+Transition counts: historical (n00=735, n01=13, n10=13, n11=1); EWMA (739, 11, 11, 1); GARCH (756, 3, 3, 0). Inference from only 3 GARCH exceptions is especially fragile. This comparison does not quantify average forecast conservatism, exceedance severity, model stability across periods, or trading/investment performance. Results are transcribed from the successful workflow console output; a versioned market-data snapshot and further validation would improve reproducibility. The initial-window-only GARCH fit is deliberately not a rolling parameter re-estimation.
