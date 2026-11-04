@@ -86,6 +86,8 @@ def main():
     returns = load_returns(args.csv, args.ticker, args.start, args.end)
     result = rolling_historical_var(returns, args.window, args.alpha)
     metrics = kupiec_pof(result["breach"].to_numpy(), args.alpha)
+    from christoffersen_var import christoffersen_tests
+    coverage = christoffersen_tests(result["breach"].to_numpy(), args.alpha)
     print(f"One-day rolling historical VaR: window={args.window}, alpha={args.alpha:.3%}")
     print(f"Forecasts={metrics['n']} | breaches={metrics['breaches']} "
           f"| expected={metrics['expected']:.2f} | observed rate={metrics['rate']:.3%}")
@@ -94,7 +96,10 @@ def main():
                          else "do not reject unconditional coverage"))
     if metrics["expected"] < 5:
         print("WARNING: fewer than five expected breaches; chi-square approximation may be unreliable.")
-    print("NOTE: unconditional coverage alone does not assess breach clustering or forecasting skill.")
+    print(f"Christoffersen independence LR={coverage['lr_ind']:.4f} | asymptotic p-value={coverage['p_ind']:.4g}")
+    print(f"Christoffersen conditional coverage LR={coverage['lr_cc']:.4f} | asymptotic p-value={coverage['p_cc']:.4g}")
+    print(f"Transitions n00={coverage['n00']}, n01={coverage['n01']}, n10={coverage['n10']}, n11={coverage['n11']}")
+    print("NOTE: independence is a first-order test; sparse breaches may weaken chi-square approximations.")
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         result.to_csv(args.output, index_label="observation")
