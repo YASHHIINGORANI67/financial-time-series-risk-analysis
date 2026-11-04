@@ -1,0 +1,27 @@
+name: MELI VaR model comparison
+
+on:
+  workflow_dispatch:
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install model dependencies
+        run: python -m pip install numpy pandas scipy yfinance
+      - name: Run offline unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Compare historical EWMA and GARCH VaR on MELI
+        run: python compare_var_models.py --ticker MELI --start 2021-12-31 --end 2026-01-16 --window 250 --alpha 0.01 --outdir model_comparison_results
+      - name: Upload comparison outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: meli-var-model-comparison
+          path: model_comparison_results/
+          if-no-files-found: error
