@@ -5,6 +5,7 @@ on:
     paths:
       - 'tests/**'
       - 'requirements.txt'
+      - 'rolling_var_backtest.py'
       - '.github/workflows/tail-risk-tests.yml'
   pull_request:
   workflow_dispatch:
