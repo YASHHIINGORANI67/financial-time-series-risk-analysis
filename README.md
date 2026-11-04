@@ -119,3 +119,19 @@ Financial Risk Management | Market Risk | Time Series Analysis | Quantitative Fi
 **Validation checklist (not completed claims):** chronological train/test split; rolling VaR forecasts; Kupiec unconditional coverage and Christoffersen independence tests where sample size permits; GARCH standardized-residual diagnostics; strategy transaction costs, turnover, benchmark alignment and look-ahead checks.
 
 **Important limitation:** with roughly 1,000 daily observations, a 99.9% empirical tail has extremely few expected exceedances. Out-of-sample backtesting at this level is statistically weak; model risk must be disclosed.
+
+## Dependency manifest and execution notes
+
+The repository now includes [`requirements.txt`](requirements.txt), derived from the imports in `Exc1y2.py`. To create an environment and run the existing analysis from the repository root:
+
+```bash
+python -m venv .venv
+# Windows: .venv\\Scripts\\activate
+# macOS/Linux: source .venv/bin/activate
+python -m pip install -r requirements.txt
+python Exc1y2.py
+```
+
+The script requires internet access to download MELI data from Yahoo Finance through `yfinance` and a graphical session to display Matplotlib charts. Its price request starts on **2021-12-31** and ends at **2026-01-16 (exclusive)**. The script uses adjusted closing prices and logarithmic returns. The dependency versions are bounded ranges, **not a tested lockfile**; the exact results depend on data-provider revisions and the installed package versions.
+
+**Verification status:** The script and its imports were inspected to prepare these instructions. A clean-environment end-to-end execution, numerical output comparison, automated test suite and rolling risk backtests have **not** been completed as part of this documentation update.
