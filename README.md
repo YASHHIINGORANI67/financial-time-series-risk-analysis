@@ -145,3 +145,25 @@ python -m unittest discover -s tests -v
 ```
 
 A [GitHub Actions workflow](.github/workflows/tail-risk-tests.yml) is configured to run these tests on relevant pushes, pull requests and manual dispatch. **These are formula-level checks, not MELI historical data validation, rolling VaR backtests or evidence of investment performance.** CI success has not yet been observed during this update.
+
+## Out-of-sample rolling VaR backtesting
+
+[`rolling_var_backtest.py`](rolling_var_backtest.py) is a **separate, new** reproducible backtest. It produces one-day-ahead rolling historical VaR forecasts, counts exceptions when the realized daily log return falls **below** the forecast VaR, and computes the Kupiec (1995) proportion-of-failures (POF) unconditional-coverage likelihood-ratio statistic.
+
+```bash
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python rolling_var_backtest.py --window 250 --alpha 0.01 --output backtest_results.csv
+```
+
+By default it downloads adjusted MELI closing prices from Yahoo Finance for 2021-12-31 through 2026-01-16 (exclusive). To avoid live downloads, provide a CSV with either `Close` or `log_return`:
+
+```bash
+python rolling_var_backtest.py --csv local_returns.csv --window 250 --alpha 0.01
+```
+
+The forecast at each observation uses **only the preceding 250 returns**, excluding the observed return being tested. With `alpha=0.01`, the model targets a 1% exception rate (99% VaR confidence). The Kupiec test reports the observed breach rate, expected count, LR statistic and approximate chi-square p-value. **A p-value at least 0.05 is not proof that the model is correct**; it means this test did not reject unconditional coverage at the 5% level.
+
+**Limitations:** The test does not assess exception independence or clustering, conditional coverage, transaction costs or portfolio-level risk. At very high confidence levels such as 99.9%, there may be too few expected breaches for a reliable asymptotic test. Yahoo Finance historical data may change. The original academic results and original `Exc1y2.py` remain unchanged.
+
+**Verification:** [Deterministic unit tests](tests/test_rolling_var.py) cover forecast timing, breach detection, sample counts, Kupiec boundary cases and invalid inputs. They are included in the [GitHub Actions workflow](.github/workflows/tail-risk-tests.yml). **No live-data backtest metrics are claimed here until a real run is reviewed.**
