@@ -167,3 +167,11 @@ The forecast at each observation uses **only the preceding 250 returns**, exclud
 **Limitations:** The test does not assess exception independence or clustering, conditional coverage, transaction costs or portfolio-level risk. At very high confidence levels such as 99.9%, there may be too few expected breaches for a reliable asymptotic test. Yahoo Finance historical data may change. The original academic results and original `Exc1y2.py` remain unchanged.
 
 **Verification:** [Deterministic unit tests](tests/test_rolling_var.py) cover forecast timing, breach detection, sample counts, Kupiec boundary cases and invalid inputs. They are included in the [GitHub Actions workflow](.github/workflows/tail-risk-tests.yml). **No live-data backtest metrics are claimed here until a real run is reviewed.**
+
+### Christoffersen exception-dependence diagnostics
+
+The backtest now also prints **Christoffersen (1998) first-order independence** (LR-ind, asymptotic chi-square with 1 degree of freedom) and **conditional coverage** (LR-cc = Kupiec LR-uc + LR-ind, asymptotic chi-square with 2 degrees of freedom), including the 00, 01, 10 and 11 breach-transition counts. See [implementation](christoffersen_var.py) and [synthetic tests](tests/test_christoffersen.py).
+
+Interpretation: independence assesses whether a breach is more likely after a previous breach; conditional coverage jointly examines the unconditional breach frequency and first-order dependence. **These tests do not establish forecasting skill or higher-order independence.** With relatively few VaR breaches, asymptotic p-values warrant caution.
+
+**Observed MELI rolling 99% historical VaR backtest (GitHub Actions run reported by project owner, 2026-11-04):** 763 forecasts, 14 breaches (1.835%) versus 7.63 expected; Kupiec LR-uc = 4.3090, p = 0.03791. The 5% unconditional coverage null was rejected, suggesting underestimated downside tail risk during this sample. These figures are reported from the completed run's console output, not independently replicated from frozen price data. Christoffersen empirical results are **pending rerun**; do not interpret successful unit tests as empirical validation.
