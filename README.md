@@ -189,3 +189,19 @@ A completed manually triggered MELI backtest, using adjusted-price data download
 Observed exception rate: **1.835%**, versus **1%** targeted. Transition counts: **n00=735, n01=13, n10=13, n11=1**. These results indicate evidence of excessive unconditional breach frequency but insufficient evidence of first-order breach dependence at the 5% level. The conditional coverage test does not reject at 5%, but its p-value is close to the threshold; non-rejection is not evidence of correct model calibration. The joint test and unconditional test can yield different decisions because they use different degrees of freedom.
 
 **Reproducibility and limitations:** These figures are transcribed from the user's completed GitHub Actions log; the market-data download has not been independently frozen or reproduced here. With only 14 exceptions, chi-square approximations may be imperfect. No conclusion is drawn about higher-order clustering or forward-looking investment performance.
+
+## Three-model VaR comparison: historical vs EWMA vs GARCH
+
+[Comparison implementation](compare_var_models.py) | [Automated workflow](.github/workflows/meli-model-comparison.yml) | [Offline tests](tests/test_compare_var_models.py)
+
+A separate out-of-sample comparison evaluates **historical rolling-quantile VaR**, **EWMA conditional-volatility normal VaR** (default decay 0.94), and **Gaussian GARCH(1,1) VaR** on exactly the same MELI forecast dates. All use one-day-ahead daily **log-return** VaR, a common 250-return initial window and default 99% confidence (alpha=0.01). EWMA estimates its mean and starting variance from training observations only, then updates variance after each realized return. GARCH(1,1) estimates mean and volatility parameters **once on the first 250 returns**, then updates conditional variance recursively without future leakage or parameter refitting. Historical VaR recalculates its quantile on the preceding 250 observations.
+
+Each model reports observed breach frequency, Kupiec unconditional coverage, Christoffersen first-order independence and conditional coverage, plus transition counts. Results are **comparative diagnostics**, not a guarantee that any model is correctly calibrated. A fixed-parameter Gaussian GARCH is not a rolling-refitted or Student-t GARCH specification, and none of these models measures portfolio-level exposure.
+
+```bash
+python -m pip install numpy pandas scipy yfinance
+python -m unittest discover -s tests -v
+python compare_var_models.py --ticker MELI --start 2021-12-31 --end 2026-01-16 --window 250 --alpha 0.01
+```
+
+For reproducible offline input, use `--csv path/to/returns.csv` with a `log_return` or `Close` column. The command writes `model_comparison_results/forecasts.csv`, `summary.csv` and `configuration.json`. The GitHub Actions workflow uploads the same outputs as downloadable artifacts. **Do not treat the workflow as a validated empirical result until its actual run and metrics have been reviewed.** Live Yahoo Finance data can be revised; a fixed versioned input dataset would improve reproducibility. Low breach counts limit the accuracy of asymptotic chi-square tests, and comparisons should not be selected solely on p-values.
