@@ -175,3 +175,17 @@ The backtest now also prints **Christoffersen (1998) first-order independence** 
 Interpretation: independence assesses whether a breach is more likely after a previous breach; conditional coverage jointly examines the unconditional breach frequency and first-order dependence. **These tests do not establish forecasting skill or higher-order independence.** With relatively few VaR breaches, asymptotic p-values warrant caution.
 
 **Observed MELI rolling 99% historical VaR backtest (GitHub Actions run reported by project owner, 2026-11-04):** 763 forecasts, 14 breaches (1.835%) versus 7.63 expected; Kupiec LR-uc = 4.3090, p = 0.03791. The 5% unconditional coverage null was rejected, suggesting underestimated downside tail risk during this sample. These figures are reported from the completed run's console output, not independently replicated from frozen price data. Christoffersen empirical results are **pending rerun**; do not interpret successful unit tests as empirical validation.
+
+### Empirical Christoffersen backtest results (2026-11-04)
+
+A completed manually triggered MELI backtest, using adjusted-price data downloaded during the run, reported **763** one-day forecasts with **14** breaches against **7.63** expected at the 99% VaR level (250-return rolling estimation window). The console output reported:
+
+| Diagnostic | LR statistic | Asymptotic p-value | Decision at 5% |
+| --- | ---: | ---: | --- |
+| Kupiec unconditional coverage (1 df) | 4.3090 | 0.03791 | Reject |
+| Christoffersen independence (1 df) | 1.3126 | 0.2519 | Do not reject |
+| Christoffersen conditional coverage (2 df) | 5.6216 | 0.06016 | Do not reject |
+
+Observed exception rate: **1.835%**, versus **1%** targeted. Transition counts: **n00=735, n01=13, n10=13, n11=1**. These results indicate evidence of excessive unconditional breach frequency but insufficient evidence of first-order breach dependence at the 5% level. The conditional coverage test does not reject at 5%, but its p-value is close to the threshold; non-rejection is not evidence of correct model calibration. The joint test and unconditional test can yield different decisions because they use different degrees of freedom.
+
+**Reproducibility and limitations:** These figures are transcribed from the user's completed GitHub Actions log; the market-data download has not been independently frozen or reproduced here. With only 14 exceptions, chi-square approximations may be imperfect. No conclusion is drawn about higher-order clustering or forward-looking investment performance.
