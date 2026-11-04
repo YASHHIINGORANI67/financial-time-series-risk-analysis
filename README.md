@@ -1,4 +1,3 @@
-
 # Financial Time Series Risk & Trading Strategy Analysis
 
 ## Project Overview
@@ -107,3 +106,16 @@ Results may vary if the underlying data provider revises historical prices.
 ## Project Focus
 
 Financial Risk Management | Market Risk | Time Series Analysis | Quantitative Finance | Python | Econometrics
+
+---
+
+## Reproducibility and validation roadmap
+**Research question:** how do historical and fitted-distribution tail risk, time-series dynamics and MACD strategy outcomes compare for MELI?
+
+**Evidence status:** the 1,013-return Python estimates above are corrected research outputs. The original report's Student-t calculations differ; do not treat the two sets of numbers as interchangeable.
+
+**Reproduction:** use the Python installation and execution instructions above. Fix the January 2022–January 2026 date range, check adjusted-price conventions and data-provider revisions, and record package versions and fitted distribution parameters before comparing numbers.
+
+**Validation checklist (not completed claims):** chronological train/test split; rolling VaR forecasts; Kupiec unconditional coverage and Christoffersen independence tests where sample size permits; GARCH standardized-residual diagnostics; strategy transaction costs, turnover, benchmark alignment and look-ahead checks.
+
+**Important limitation:** with roughly 1,000 daily observations, a 99.9% empirical tail has extremely few expected exceedances. Out-of-sample backtesting at this level is statistically weak; model risk must be disclosed.
